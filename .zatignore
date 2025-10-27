@@ -1,0 +1,7 @@
+# Ignored when packaging/uploading with ZAT
+node_modules/
+dist/
+.DS_Store
+*.log
+*.zip
+.github/

@@ -1,0 +1,48 @@
+name: Deploy demo to gh-pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Prepare dist folder
+        run: |
+          set -e
+          mkdir -p dist
+
+          # Copy and rename the main HTML (canonical source file)
+          cp simple-passphrase-generator.html dist/index.html || \
+          cp assets/simple-passphrase-generator.html dist/index.html
+
+          # Copy optional static assets if they exist at repo root
+          for f in robots.txt sitemap.xml favicon.png og-preview.png; do
+            if [ -f "$f" ]; then
+              cp "$f" dist/
+              echo "✔ Copied $f"
+            else
+              echo "⚠️  $f not found at repo root, skipping"
+            fi
+          done
+
+          # Prevent Jekyll from processing
+          touch dist/.nojekyll
+
+      - name: Deploy to gh-pages branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: dist
+          clean: true

@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Canonical -->
+    <link
+      rel="canonical"
+      href="https://martinvicknair.github.io/simple-passphrase-generator/"
+    />
+
+    <!-- Title & Description -->
+    <title>
+      Simple Passphrase Generator – Create Easy, Secure, Phone-Friendly Login
+      Phrases
+    </title>
+    <meta
+      name="description"
+      content="Generate NIST-compliant, human-readable passphrases for customer support and temporary logins. Color + object + integer format, easy to read over the phone."
+    />
+    <meta
+      name="keywords"
+      content="passphrase generator, secure passphrase, memorable password, temporary login, CSR password reset, phone verification"
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Simple Passphrase Generator" />
+    <meta
+      property="og:description"
+      content="CSR-friendly passphrase generator: color + object + integer for easy, secure temporary logins."
+    />
+    <meta
+      property="og:url"
+      content="https://martinvicknair.github.io/simple-passphrase-generator/"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://martinvicknair.github.io/simple-passphrase-generator/og-preview.png"
+    />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Simple Passphrase Generator" />
+    <meta
+      name="twitter:description"
+      content="CSR-friendly passphrase generator: color + object + integer for easy, secure temporary logins."
+    />
+    <meta
+      name="twitter:image"
+      content="https://martinvicknair.github.io/simple-passphrase-generator/og-preview.png"
+    />
+
+    <meta name="theme-color" content="#0f1115" />
+    <meta name="robots" content="index,follow" />
+    <link rel="icon" href="favicon.png" type="image/png" />
+
+    <style>
+      :root {
+        --bg: #0f1115;
+        --panel: #171923;
+        --panel2: #0d0f15;
+        --border: #283143;
+        --fg: #eaeef5;
+        --muted: #8b97a7;
+        --subtle: #9eb7d1;
+        --accent-2: #5fa8f0;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu,
+          Cantarell, 'Helvetica Neue', Arial, Noto Sans;
+        background: var(--bg);
+        color: var(--fg);
+      }
+
+      .wrap {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 48px 16px 96px;
+      }
+      h1 {
+        font-size: 28px;
+        margin: 0 0 6px;
+        letter-spacing: 0.2px;
+        text-align: left;
+      }
+
+      .panel {
+        background: linear-gradient(180deg, var(--panel), #0f131c);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 24px 18px 18px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      }
+
+      /* pattern line centered at all sizes */
+      .pattern {
+        color: var(--muted);
+        margin: 0 0 14px;
+        text-align: center;
+      }
+      .pattern code {
+        display: inline-block;
+        font-size: 90%;
+        color: var(--subtle);
+      }
+
+      .row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        background: var(--panel2);
+        border: 1px solid var(--border);
+        padding: 14px 12px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.06s ease, box-shadow 0.18s ease,
+          background 0.18s ease, border-color 0.18s ease;
+      }
+      .row:active {
+        transform: scale(0.996);
+      }
+
+      .row.action {
+        font-weight: 700;
+        letter-spacing: 0.2px;
+        background: linear-gradient(180deg, #1b3a5e, #0f2a48);
+        border-color: #2b4f77;
+      }
+      .row.action:hover {
+        background: linear-gradient(180deg, #20446f, #123559);
+        border-color: #355f90;
+        box-shadow: 0 0 18px rgba(58, 163, 255, 0.18);
+      }
+
+      .pass {
+        font-size: 22px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          'Liberation Mono', 'Courier New', monospace;
+        letter-spacing: 0.2px;
+        user-select: all;
+      }
+
+      .copyhint {
+        color: var(--muted);
+        font-size: 12px;
+        text-align: center;
+        margin: 2px 0 8px;
+      }
+
+      .phrases {
+        border: 1px dashed var(--border);
+        border-radius: 12px;
+        padding: 8px;
+        margin-bottom: 12px;
+        max-height: 60vh;
+        overflow: auto;
+      }
+
+      @keyframes glowFade {
+        0% {
+          box-shadow: 0 0 0 rgba(95, 168, 240, 0);
+        }
+        12% {
+          box-shadow: 0 0 16px rgba(95, 168, 240, 0.85);
+        }
+        100% {
+          box-shadow: 0 0 0 rgba(95, 168, 240, 0);
+        }
+      }
+      .glow {
+        animation: glowFade 900ms ease-out;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        align-items: start;
+      }
+      label {
+        color: #c9d3e2;
+        font-size: 14px;
+        display: block;
+      }
+      select {
+        width: 100%;
+        margin-top: 6px;
+        background: #0f1520;
+        border: 1px solid #2d3b54;
+        color: #eaeef5;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 14px;
+        outline: none;
+      }
+      .est-inline {
+        color: var(--subtle);
+        font-weight: 400;
+      }
+
+      .source-link {
+        display: block;
+        text-align: center;
+        font-size: 12px;
+        margin-top: 20px;
+      }
+      .source-link a {
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.15s ease;
+      }
+      .source-link a:hover {
+        color: var(--accent-2);
+        text-decoration: underline;
+      }
+
+      .seo-info {
+        max-width: 720px;
+        margin: 14px auto 0;
+        color: #c9d3e2;
+        line-height: 1.6;
+        font-size: 12px;
+      }
+      .seo-info h2 {
+        font-size: 18px;
+        margin: 0 0 6px;
+        color: #eaeef5;
+        text-align: center;
+      }
+
+      @media (max-width: 600px) {
+        h1 {
+          text-align: center;
+        }
+        .pass {
+          font-size: 17px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="panel">
+        <h1>Simple Passphrase Generator</h1>
+
+        <!-- Pattern line (centered) -->
+        <p class="pattern"><code>color + object + integer</code></p>
+
+        <!-- Generate -->
+        <div
+          id="genRow"
+          class="row action"
+          role="button"
+          aria-label="Generate new passphrases"
+          tabindex="0"
+        >
+          Generate
+        </div>
+
+        <!-- Output list + hint -->
+        <section class="phrases" aria-label="Generated passphrases">
+          <div id="list"></div>
+          <p class="copyhint">Tip: click a passphrase to copy</p>
+        </section>
+
+        <!-- Controls: minimum length with inline estimate -->
+        <div class="controls">
+          <label for="minLen">
+            <span
+              >Min. Characters
+              <span id="est" class="est-inline"
+                >(over … unique phrases)</span
+              ></span
+            >
+            <select id="minLen">
+              <option>12</option>
+              <option>13</option>
+              <option>14</option>
+              <option selected>15</option>
+              <option>16</option>
+              <option>17</option>
+              <option>18</option>
+              <option>19</option>
+              <option>20</option>
+            </select>
+          </label>
+        </div>
+
+        <p class="source-link">
+          <a
+            href="https://github.com/martinvicknair/simple-passphrase-generator"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View source on GitHub
+          </a>
+        </p>
+      </div>
+
+      <section class="seo-info" aria-label="About this generator">
+        <!-- Commented out for Zendesk app use BEGIN -->
+        <!-- <h2 style="text-align: center">About This Passphrase Generator</h2>
+        <p style="text-align: justify">
+          Create NIST-compliant login phrases using a simple formula:
+          <strong>color + object + integer</strong>. Perfect for customer
+          support reps handling temporary account resets. 100% browser-based, no
+          data is sent. Includes customizable word lists.
+        </p>
+        <p style="text-align: center; margin-top: 10px; color: #9eb7d1">
+          <em>Available soon as a Zendesk app</em>
+        </p> -->
+        <!-- Commented out for Zendesk app use END-->
+
+        <noscript>
+          <p style="margin: 8px 0 0; color: #9eb7d1">
+            Note: JavaScript is required to generate passphrases.
+          </p>
+        </noscript>
+      </section>
+    </div>
+
+    <script>
+      /* -------------------------------------------------------------------------
+       *  WORD LISTS
+       * ------------------------------------------------------------------------- */
+      const COLOR = [
+        'blue',
+        'brown',
+        'gold',
+        'green',
+        'orange',
+        'pink',
+        'purple',
+        'red',
+        'silver',
+        'yellow',
+      ];
+      const ANIMALS = [
+        'armadillo',
+        'bat',
+        'bear',
+        'bird',
+        'bug',
+        'camel',
+        'capybara',
+        'cat',
+        'chicken',
+        'cow',
+        'crab',
+        'cub',
+        'deer',
+        'dog',
+        'dolphin',
+        'duck',
+        'eagle',
+        'elephant',
+        'fish',
+        'fox',
+        'frog',
+        'gecko',
+        'goat',
+        'goose',
+        'hippo',
+        'horse',
+        'kangaroo',
+        'kitten',
+        'lion',
+        'lizard',
+        'monkey',
+        'mouse',
+        'otter',
+        'owl',
+        'panda',
+        'penguin',
+        'pig',
+        'puppy',
+        'rabbit',
+        'seal',
+        'shark',
+        'sheep',
+        'skunk',
+        'snail',
+        'spider',
+        'swan',
+        'tiger',
+        'turkey',
+        'turtle',
+        'whale',
+        'wolf',
+        'zebra',
+      ];
+      const VEGETABLES = [
+        'apple',
+        'apricot',
+        'avocado',
+        'banana',
+        'bean',
+        'broccoli',
+        'cabbage',
+        'carrot',
+        'cauliflower',
+        'celery',
+        'cherry',
+        'coconut',
+        'corn',
+        'cucumber',
+        'garlic',
+        'ginger',
+        'grape',
+        'kiwi',
+        'lemon',
+        'lettuce',
+        'lime',
+        'mango',
+        'pear',
+        'plum',
+        'potato',
+        'raisin',
+        'tomato',
+        'tree',
+      ];
+      const MINERALS = [
+        'beach',
+        'bike',
+        'box',
+        'chair',
+        'circle',
+        'cloud',
+        'door',
+        'house',
+        'moon',
+        'phone',
+        'rock',
+        'square',
+        'star',
+        'table',
+        'triangle',
+      ];
+      const OBJECTS = [...ANIMALS, ...VEGETABLES, ...MINERALS];
+
+      const BANNED_SUBSTRINGS = ['obsceneWordsHere'];
+      const BANNED_NUMS = ['13', '69', '420', '666', '1488'];
+      const SEPARATORS_ALLOWED = ['.', '-'];
+
+      let MIN_TOTAL_CHARS = 15; // default
+
+      /* -------------------------------------------------------------------------
+       *  HELPERS
+       * ------------------------------------------------------------------------- */
+      function cryptoInt(max) {
+        const b = new Uint32Array(1);
+        let r;
+        const lim = Math.floor(0x100000000 / max) * max;
+        do {
+          crypto.getRandomValues(b);
+          r = b[0] >>> 0;
+        } while (r >= lim);
+        return r % max;
+      }
+      const pick = (a) => a[cryptoInt(a.length)];
+      const lettersOnly = (s) => s.toLowerCase().replace(/[^a-z]/g, '');
+      const randomSeparator = () =>
+        SEPARATORS_ALLOWED[cryptoInt(SEPARATORS_ALLOWED.length)];
+      function randomDigits(len) {
+        let s = String(1 + cryptoInt(9));
+        for (let i = 1; i < len; i++) s += String(cryptoInt(10));
+        return s;
+      }
+      function hasBanned(s) {
+        const low = s.toLowerCase();
+        if (BANNED_SUBSTRINGS.some((b) => b && low.includes(b))) return true;
+        const m = low.match(/(\d+)$/);
+        const digits = m ? m[1] : '';
+        if (BANNED_NUMS.some((n) => n && digits.includes(String(n))))
+          return true;
+        return false;
+      }
+
+      /* -------------------------------------------------------------------------
+       *  GENERATION (first word always capitalized)
+       * ------------------------------------------------------------------------- */
+      function buildPhraseNearMin(minChars) {
+        const sep = randomSeparator();
+        const words = [lettersOnly(pick(COLOR)), lettersOnly(pick(OBJECTS))];
+        words[0] = words[0][0].toUpperCase() + words[0].slice(1);
+
+        const baseLen = () => words.join(sep).length;
+        while (true) {
+          const base = baseLen();
+          if (base + sep.length + 3 >= minChars) {
+            const d = randomDigits(3);
+            return words.join(sep) + sep + d;
+          }
+          if (base + sep.length + 4 >= minChars) {
+            const d = randomDigits(4);
+            return words.join(sep) + sep + d;
+          }
+          words.push(lettersOnly(pick(OBJECTS)));
+          const base2 = baseLen();
+          const meets3 = base2 + sep.length + 3 >= minChars;
+          const meets4 = base2 + sep.length + 4 >= minChars;
+          if (meets3 || meets4) {
+            const over3 = base2 + sep.length + 3 - minChars;
+            const over4 = base2 + sep.length + 4 - minChars;
+            const use4 = meets4 && (!meets3 || over4 < over3);
+            const d = randomDigits(use4 ? 4 : 3);
+            return words.join(sep) + sep + d;
+          }
+        }
+      }
+
+      function generateOne(minChars) {
+        for (let i = 0; i < 800; i++) {
+          const p = buildPhraseNearMin(minChars);
+          if (!hasBanned(p)) return p;
+        }
+        return '[no fit]';
+      }
+
+      /* -------------------------------------------------------------------------
+       *  UI
+       * ------------------------------------------------------------------------- */
+      function renderPassRow(text) {
+        const row = document.createElement('div');
+        row.className = 'row';
+        row.setAttribute('role', 'button');
+        row.tabIndex = 0;
+
+        const span = document.createElement('span');
+        span.className = 'pass';
+        span.textContent = text;
+        row.appendChild(span);
+
+        const activate = () => {
+          const pulse = () => {
+            row.classList.remove('glow');
+            void row.offsetWidth;
+            row.classList.add('glow');
+          };
+          const p =
+            navigator.clipboard?.writeText(text) ??
+            Promise.reject(new Error('Clipboard API unavailable'));
+          Promise.resolve(p)
+            .catch(() => {})
+            .finally(pulse);
+        };
+
+        row.addEventListener('click', activate);
+        row.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            activate();
+          }
+        });
+        return row;
+      }
+
+      function generate() {
+        const list = document.getElementById('list');
+        list.innerHTML = '';
+        for (let i = 0; i < 4; i++)
+          list.appendChild(renderPassRow(generateOne(MIN_TOTAL_CHARS)));
+      }
+
+      /* -------------------------------------------------------------------------
+       *  ESTIMATOR (two-word + three-word; conservative & monotonic)
+       * ------------------------------------------------------------------------- */
+      // More faithful estimator: mirrors the generator's flow.
+      // For each Color+Object pair:
+      //  - If it can meet the min with 3 or 4 digits -> count only 2-word phrases.
+      //  - Otherwise -> add third-word choices and count 3-word phrases that meet the min.
+      function estimateCombinations(minChars) {
+        const colorLens = COLOR.map((w) => w.length);
+        const objectLens = OBJECTS.map((w) => w.length);
+
+        // Digits (conservative 10% discount for banned patterns)
+        const D3 = Math.floor(900 * 0.9); // 100–999
+        const D4 = Math.floor(9000 * 0.9); // 1000–9999
+
+        // Separators included in total length
+        const SEPS_2 = 2; // w1-w2 and before digits
+        const SEPS_3 = 3; // w1-w2, w2-w3, and before digits
+
+        // Threshold sums needed from words alone
+        const need2_3 = minChars - (SEPS_2 + 3);
+        const need2_4 = minChars - (SEPS_2 + 4);
+        const need3_3 = minChars - (SEPS_3 + 3);
+        const need3_4 = minChars - (SEPS_3 + 4);
+
+        let c2 = 0; // two-word phrase count "slots"
+        let c3 = 0; // three-word phrase count "slots"
+
+        for (const cl of colorLens) {
+          for (const o1 of objectLens) {
+            const L2 = cl + o1;
+
+            if (L2 >= need2_3) {
+              // Two-word with 3 digits
+              c2 += D3;
+              continue;
+            }
+            if (L2 >= need2_4) {
+              // Two-word with 4 digits
+              c2 += D4;
+              continue;
+            }
+
+            // Otherwise, this pair would trigger the generator to add a third word.
+            for (const o2 of objectLens) {
+              const L3 = L2 + o2;
+              if (L3 >= need3_3) {
+                c3 += D3;
+              } else if (L3 >= need3_4) {
+                c3 += D4;
+              }
+            }
+          }
+        }
+
+        // Per-phrase separator choice ('.' or '-')
+        const SEP_CHOICES = SEPARATORS_ALLOWED.length || 2;
+
+        return SEP_CHOICES * (c2 + c3);
+      }
+
+      // Compact K/M/B notation
+      function humanizeCount(n) {
+        if (n >= 1e9)
+          return (n / 1e9).toFixed(1).replace(/\.0$/, '') + ' billion';
+        if (n >= 1e6)
+          return (n / 1e6).toFixed(1).replace(/\.0$/, '') + ' million';
+        if (n >= 1e3) return Math.round(n / 1e3) + ',000';
+        return n.toString();
+      }
+
+      function updateEstimateInline() {
+        const n = estimateCombinations(MIN_TOTAL_CHARS);
+        const el = document.getElementById('est');
+        if (el) el.textContent = `(over ${humanizeCount(n)} unique phrases)`;
+      }
+
+      const genRow = document.getElementById('genRow');
+      genRow.addEventListener('click', generate);
+      genRow.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          generate();
+        }
+      });
+
+      const minSel = document.getElementById('minLen');
+      minSel.addEventListener('change', () => {
+        MIN_TOTAL_CHARS = parseInt(minSel.value, 10);
+        updateEstimateInline();
+        generate();
+      });
+
+      // Initial render
+      MIN_TOTAL_CHARS = parseInt(minSel.value, 10) || 15;
+      updateEstimateInline();
+      generate();
+    </script>
+
+    <!-- ZAF v2 SDK (Zendesk provides this URL in the container) -->
+    <script src="https://static.zdassets.com/zendesk_app_framework_sdk/2.0/zaf_sdk.min.js"></script>
+    <script>
+      (function () {
+        if (!window.ZAFClient) return; // allow standalone usage too
+        const client = ZAFClient.init();
+
+        // helper: measure and resize
+        function resizeToContent() {
+          const body = document.body;
+          const h = Math.ceil(body.scrollHeight);
+          client.invoke('resize', {
+            width: '100%',
+            height: Math.min(h, 900) + 'px',
+          });
+        }
+
+        // initial + on changes (basic)
+        resizeToContent();
+        const ro = new ResizeObserver(resizeToContent);
+        ro.observe(document.body);
+
+        // regenerate may change height → hook your button
+        const genBtn = document.getElementById('genRow');
+        if (genBtn)
+          genBtn.addEventListener('click', () =>
+            setTimeout(resizeToContent, 0)
+          );
+      })();
+    </script>
+  </body>
+</html>

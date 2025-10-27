@@ -1,0 +1,23 @@
+{
+  "name": "Simple Passphrase Generator",
+  "author": {
+    "name": "Martin Vicknair",
+    "email": "your-email@example.com"
+  },
+  "defaultLocale": "en",
+  "private": true,
+  "frameworkVersion": "2.0",
+  "location": {
+    "support": {
+      "ticket_sidebar": {
+        "url": "assets/simple-passphrase-generator.html"
+      }
+    }
+  },
+  "version": "1.0.0",
+  "brandPermissions": "all",
+  "singleInstall": true,
+  "requirementsOnly": false,
+  "parameters": [],
+  "signedUrls": false
+}

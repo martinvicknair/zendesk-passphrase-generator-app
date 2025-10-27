@@ -1,0 +1,7 @@
+{
+  "app": {
+    "name": "Simple Passphrase Generator",
+    "short_description": "CSR-friendly passphrases (color + object + integer).",
+    "long_description": "Generate NIST-compliant, phone-readable passphrases for temporary resets. Runs entirely in the browser; no data is sent."
+  }
+}
